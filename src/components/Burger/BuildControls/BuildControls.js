@@ -22,6 +22,7 @@ const buildControls = (props) =>(
                         moreClicked={() => props.moreClick(control.type)}
                         />    
         ))}
+        <button disabled={!props.purchasable} className={classes.OrderButton}>ORDER NOW</button>
     </div>
 );
 
