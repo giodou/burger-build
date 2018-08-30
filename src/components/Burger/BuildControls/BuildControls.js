@@ -22,7 +22,11 @@ const buildControls = (props) =>(
                         moreClicked={() => props.moreClick(control.type)}
                         />    
         ))}
-        <button disabled={!props.purchasable} className={classes.OrderButton}>ORDER NOW</button>
+        <button disabled={!props.purchasable} 
+                className={classes.OrderButton}
+                onClick={() => props.purchaseClick()}>
+                ORDER NOW
+        </button>
     </div>
 );
 
