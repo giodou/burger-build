@@ -1,7 +1,8 @@
-import React from 'react';
+import React from 'react'
 
-import classes from './BuildControls.css';
-import BuildControl from './BuildControl/BuildControl';
+import classes from './BuildControls.css'
+import BuildControl from './BuildControl/BuildControl'
+import Price from '../Price/Price'
 
 const controls = [
     {label: 'Salad', type: 'salad'},
@@ -12,7 +13,7 @@ const controls = [
 
 const buildControls = (props) =>(
     <div className={classes.BuildControls}>
-        <p>Total price: <strong>${props.totalPrice.toFixed(2)}</strong></p>
+        <Price>{props.totalPrice}</Price>
         {controls.map(control =>(
             <BuildControl 
                         key={control.label} 
@@ -30,4 +31,4 @@ const buildControls = (props) =>(
     </div>
 );
 
-export default buildControls;
+export default buildControls
