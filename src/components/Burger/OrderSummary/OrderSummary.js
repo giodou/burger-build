@@ -6,11 +6,11 @@ import Price from '../Price/Price'
 
 const orderSummary = (props) => {
 
-    const ingredientsSummary = Object.keys(props.ingredients)
-        .map(igKey => {
+    const ingredientsSummary = props.ingredients
+        .map(ingredient => {
             return (
-                <li key={igKey}>
-                    <span style={{ textTransform: 'capitalize' }}>{igKey}</span>: {props.ingredients[igKey]}
+                <li key={ingredient.label}>
+                    <span>{ingredient.label}</span>: {ingredient.quantity}
                 </li>
             )
         });
