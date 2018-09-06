@@ -13,11 +13,12 @@ import withErrorHandler from '../../hoc/withErrorHandler/whithErrorHandler';
 class BurgerBuilder extends Component {
 
     state = {
-        ingredients: [],
+        ingredients: null,
         purchasable: false,
         purchasing: false,
         totalPrice: 4,
-        loading: false
+        loading: false, 
+        error: false
     }
 
     componentDidMount() {
@@ -36,6 +37,9 @@ class BurgerBuilder extends Component {
                 })
 
                 this.updatePurchasable(response.data)
+            })
+            .catch(error => {
+                this.setState({error: "Ingredients can't be loaded"})
             })
     }
 
@@ -111,6 +115,7 @@ class BurgerBuilder extends Component {
         })
 
         const order = {
+            // eslint-disable-next-line
             ingredients: [...this.state.ingredients].map(ingredient =>{
                 if(ingredient.quantity > 0)
                     return ingredient;
@@ -135,7 +140,7 @@ class BurgerBuilder extends Component {
     }
 
     render() {
-        let burgerElement = <Spinner />;
+        let burgerElement = this.state.error ? this.state.error :  <Spinner />;
         let orderSummary = <Spinner />;
 
         if (this.state.ingredients) {
@@ -158,7 +163,6 @@ class BurgerBuilder extends Component {
                             purchaseCancelled={this.purchaseCancelHandler}
                             purchaseContinued={this.purchaseContinueHandler}
                             total={this.state.totalPrice} />
-
         }
 
         if (this.state.loading)
