@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import { Route } from 'react-router-dom';
 
 import axios from '../../axios-order';
 import Aux from '../../hoc/Auxiliar/Auxiliar';
 import Burger from '../../components/Burger/Burger';
 import BuilControls from '../../components/Burger/BuildControls/BuildControls';
+import Checkout from '../Checkout/Checkout';
 
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
@@ -17,8 +19,9 @@ class BurgerBuilder extends Component {
         purchasable: false,
         purchasing: false,
         totalPrice: 4,
-        loading: false, 
-        error: false
+        loading: false,
+        error: false,
+        page: false
     }
 
     componentDidMount() {
@@ -31,7 +34,7 @@ class BurgerBuilder extends Component {
                     return sum + (el.quantity * el.price);
                 }, 0)
 
-                this.setState({ 
+                this.setState({
                     ingredients: Object.values(response.data),
                     totalPrice: this.state.totalPrice + defaultPrice
                 })
@@ -39,7 +42,7 @@ class BurgerBuilder extends Component {
                 this.updatePurchasable(response.data)
             })
             .catch(error => {
-                this.setState({error: "Ingredients can't be loaded"})
+                this.setState({ error: "Ingredients can't be loaded" })
             })
     }
 
@@ -60,14 +63,14 @@ class BurgerBuilder extends Component {
             const updatedIngredients = [...this.state.ingredients];
             const updatedTotalPrice = this.state.totalPrice - ingredient.price;
 
-            updatedIngredients.map(updatedIngredient =>{
-                if(updatedIngredient === ingredient){
+            updatedIngredients.map(updatedIngredient => {
+                if (updatedIngredient === ingredient) {
                     updatedIngredient.quantity--;
                 }
 
                 return updatedIngredient;
             })
-            
+
             this.setState({
                 ingredients: updatedIngredients,
                 totalPrice: updatedTotalPrice
@@ -78,16 +81,15 @@ class BurgerBuilder extends Component {
     }
 
     addIngredienthandler = (ingredient) => {
-        const updateIngredients = [ ...this.state.ingredients ];
+        const updateIngredients = [...this.state.ingredients];
         let updatedTotalPrice = this.state.totalPrice;
 
-        updateIngredients.map(ingredientUpdated =>{
-            if(ingredient === ingredientUpdated)
-            {
+        updateIngredients.map(ingredientUpdated => {
+            if (ingredient === ingredientUpdated) {
                 ingredientUpdated.quantity++;
                 updatedTotalPrice = updatedTotalPrice + ingredient.price;
             }
-            
+
             return ingredientUpdated;
         })
 
@@ -110,42 +112,38 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
-        this.setState({
-            loading: true
-        })
 
-        const order = {
-            // eslint-disable-next-line
-            ingredients: [...this.state.ingredients].map(ingredient =>{
-                if(ingredient.quantity > 0)
-                    return ingredient;
-            }),
-            price: this.state.price,
-            customer: {
-                name: 'Giovane Timm',
-                adress: 'Rua paraná, 530',
-                city: 'Toledo',
-                zipCode: '85909563'
-            },
-            deliveryMethod: 'fastest'
-        }
+        //comented to futures references, before launch  
+        /*
+            const queryParams = [];
+            for (let i in this.state.ingredients) {
+                queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));
+            }
+            queryParams.push('price=' + this.state.totalPrice);
+            const queryString = queryParams.join('&');
+        */
 
-        axios.post('/orders.json', order)
-            .then(response => {
-                this.setState({ loading: false, purchasing: false })
-            })
-            .catch(error => {
-                this.setState({ loading: false, purchasing: false })
-            })
+        console.log('URL: ', this.props.match.path + '/checkout')
+
+        //this.props.history.replace('/checkout');
+
+        this.props.history.push({
+            pathname: this.props.match.path + '/checkout'
+        });
+        this.setState({ page: 'checkout' });
     }
 
     render() {
-        let burgerElement = this.state.error ? this.state.error :  <Spinner />;
+
+        console.log('PRPPSSS: ', this.props);
+
+
+        let burgerElement = this.state.error ? this.state.error : <Spinner />;
         let orderSummary = <Spinner />;
 
         if (this.state.ingredients) {
             burgerElement = (
-                <Aux>            
+                <Aux>
                     <Burger ingredients={this.state.ingredients} />
                     <BuilControls
                         ingredients={this.state.ingredients}
@@ -154,27 +152,35 @@ class BurgerBuilder extends Component {
                         lessClick={this.removeIngredientHandler}
                         moreClick={this.addIngredienthandler}
                         purchaseClick={this.purchaseHandler}
-                        />
+                    />
                 </Aux>
             )
 
             orderSummary = <OrderSummary
-                            ingredients={this.state.ingredients}
-                            purchaseCancelled={this.purchaseCancelHandler}
-                            purchaseContinued={this.purchaseContinueHandler}
-                            total={this.state.totalPrice} />
+                ingredients={this.state.ingredients}
+                purchaseCancelled={this.purchaseCancelHandler}
+                purchaseContinued={this.purchaseContinueHandler}
+                total={this.state.totalPrice} />
         }
 
         if (this.state.loading)
             orderSummary = <Spinner />
 
-        return (
+        const page = (
             <Aux>
                 <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler}>
                     {orderSummary}
                 </Modal>
-
                 {burgerElement}
+            </Aux>
+        )
+
+        return (
+            <Aux>
+                {!this.state.page ? page : null}
+                <Route
+                    path={this.props.match.path + '/checkout'}
+                    render={(props) => (<Checkout ingredients={this.state.ingredients} price={this.state.totalPrice} {...props} />)} />
 
             </Aux>
         );

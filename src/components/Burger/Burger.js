@@ -4,6 +4,7 @@ import classes from './Burger.css'
 import BurgerIngredient from './BurgerIgredient/BurgerIngredient'
 
 const burger = (props) => {
+    console.log('Props: ', props);
 
     /**
      * Transform the ingredients properts into an array of BurgerIngredient component
